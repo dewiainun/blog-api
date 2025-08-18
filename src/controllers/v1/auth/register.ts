@@ -91,6 +91,6 @@ const register = async (req: Request, res: Response): Promise<void> => {
         });
         logger.error('Error during user registration', err);
     }
-}
+};
 
 export default register;
