@@ -21,6 +21,7 @@ controllers
 */
 import getCurrentUser from '@/controllers/v1/user/get_current_user';
 import updateCurrentUser from '@/controllers/v1/user/update_current_user';
+import deleteCurrentUser from '@/controllers/v1/user/detele_current_user';
 
 /*  
 models
@@ -88,7 +89,19 @@ router.put(
 );
 
 // for delete
+router.delete(
+    '/current',
+    authenticate,
+    authorize(['admin', 'user']),
+    deleteCurrentUser,
+);
 
+// get all users
+router.get(
+    "/",
+    authorize(['admin']),
+    getAllUser
+)
 export default router;
 
 
