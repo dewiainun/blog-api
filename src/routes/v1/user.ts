@@ -23,6 +23,7 @@ import getCurrentUser from '@/controllers/v1/user/get_current_user';
 import updateCurrentUser from '@/controllers/v1/user/update_current_user';
 import deleteCurrentUser from '@/controllers/v1/user/detele_current_user';
 import getAllUser from '@/controllers/v1/user/get_all_user';
+import getUser from '@/controllers/v1/user/get_user';
 
 /*  
 models
@@ -112,7 +113,21 @@ router.get(
         .withMessage('Offset must be positive integer'),
     validationError,    
     getAllUser,
-)
+);
+
+//get user by id
+router.get(
+    '/:userId',
+    authenticate,
+    authorize(['admin']),
+    param('userId').notEmpty().isMongoId().withMessage('Invalid user ID'),
+    validationError,
+    getUser,
+);
+
+
+//detelete user by id
+
 export default router;
 
 
