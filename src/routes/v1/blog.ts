@@ -23,6 +23,8 @@ controllers
 */
 import createBlog from '@/controllers/v1/blog/create_blog';
 import getAllBlogs from '@/controllers/v1/blog/get_all_blogs';
+import getBlogsByUser from '@/controllers/v1/blog/get_blogs_by_user';
+import getBlogBySlug from '@/controllers/v1/blog/get_blog_by_slug';
 
 const upload = multer();
 
@@ -68,5 +70,31 @@ router.get(
     validationError,    
     getAllBlogs,
 );
+
+router.get(
+    "/user/:userId",
+    authenticate,
+    authorize(['admin', 'user']),
+    param('userId').isMongoId().withMessage('Invalid user ID'),
+    query('limit')
+        .optional()
+        .isInt({ min: 1, max: 50 })
+        .withMessage('Limit must be between 1 to 50'),
+    query('offset')
+        .optional()
+        .isInt({ min: 0 })
+        .withMessage('Offset must be positive integer'),
+    validationError,    
+    getBlogsByUser,
+);
+
+router.get(
+    '/:slug',
+    authenticate,
+    authorize(['admin', 'user']),
+    param('slug').notEmpty().withMessage('Slug is required'),
+    validationError,
+    getBlogBySlug
+)
 
 export default router;
