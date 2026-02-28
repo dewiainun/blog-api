@@ -70,3 +70,5 @@ const likeBlog = async (req: Request, res: Response): Promise<void> => {
 }
 
 export default likeBlog;
+
+// lanjut nanti buat unlike blog
