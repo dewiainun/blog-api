@@ -20,44 +20,43 @@ import Like from '@/models/like';
  */
 import type { Request, Response } from 'express';
 
-const likeBlog = async (req: Request, res: Response): Promise<void> => {
+const unlikeBlog = async (req: Request, res: Response): Promise<void> => {
     const { blogId } = req.params;
     const { userId } = req.body;
 
     try {
+        const exitingLike = await Like.findOne({ blogId, userId }).lean().exec();
+
+        if (!exitingLike) {
+        res.status(404).json({
+            code: 'BadRequest',
+            message: 'Like not found',
+        });
+        return;
+    }
+
+    await Like.deleteOne({ _id: exitingLike._id });
+
         const blog = await Blog.findById(blogId).select('likesCount').exec();
 
         if (!blog) {
-            res.status(404).json({
-                code: 'NotFound',
-                message: 'Blog not found',
-            });
-            return;
+        res.status(404).json({
+            code: 'BadRequest',
+            message: 'Blog not found',
+        });
+        return;
         }
 
-        const existingLike = await Like.findOne({ blogId, userId }).lean().exec();
-        if (existingLike) {
-            res.status(400).json({
-                code: 'BadRequest',
-                message: 'You have already liked this blog',
-            });
-            return;
-        }
-
-        await Like.create({ blogId, userId });
-
-        blog.likesCount ++;
+        blog.likesCount --;
         await blog.save();
 
-        logger.info('Blog liked successfully', { 
+        logger.info('Blog unliked successfully', { 
             userId,
             blogId: blog._id,
             likesCount: blog.likesCount,
         });
-        
-        res.status(200).json({
-            likesCount: blog.likesCount
-        })
+
+        res.sendStatus(204);
     } catch (err) {
                 res.status(500).json({
                     code: 'ServerError',
@@ -69,4 +68,4 @@ const likeBlog = async (req: Request, res: Response): Promise<void> => {
             }
 }
 
-export default likeBlog;
+export default unlikeBlog;
